@@ -249,14 +249,19 @@ void RealSensePlugin::OnNewDepthFrame() {
 
   // Convert Float depth data to RealSense depth data
   const float *depthDataFloat = this->depthCam->DepthData();
-  for (unsigned int i = 0; i < imageSize; ++i) {
+  for (unsigned int i = 0; i < imageSize; ++i) 
+  {
     // Check clipping and overflow
-    if (depthDataFloat[i] < rangeMinDepth_ ||
-        depthDataFloat[i] > rangeMaxDepth_ ||
-        depthDataFloat[i] > DEPTH_SCALE_M * UINT16_MAX ||
-        depthDataFloat[i] < 0) {
-      this->depthMap[i] = 0;
-    } else {
+    if ((depthDataFloat[i] >= rangeMaxDepth_) || (depthDataFloat[i] <= 0))
+    {
+      this->depthMap[i] = rangeMaxDepth_ / DEPTH_SCALE_M;
+    }
+    else if (depthDataFloat[i] <= rangeMinDepth_)
+    {
+      this->depthMap[i] = rangeMinDepth_ / DEPTH_SCALE_M;
+    }
+    else
+    {
       this->depthMap[i] = (uint16_t)(depthDataFloat[i] / DEPTH_SCALE_M);
     }
   }
